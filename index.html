@@ -22,10 +22,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Zentriert die Login-Box am Anfang */
+            justify-content: center;
         }
 
-        /* 🔒 STYLING FÜR DEN SPERRBILDSCHIRM (TÜRSTEHER) */
         #loginOverlay {
             background: white;
             border: 4px solid var(--accent-pink);
@@ -56,9 +55,8 @@
             margin-top: 15px;
         }
 
-        /* 🤫 DIE EIGENTLICHE APP (Am Anfang unsichtbar) */
         #mainAppContent {
-            display: none; /* Wird erst per JavaScript eingeschaltet */
+            display: none;
             flex-direction: column;
             align-items: center;
             width: 100%;
@@ -207,9 +205,9 @@
 <body>
 
     <div id="loginOverlay">
-        <h2>Wir alle Wissen welches Passwort du brauchst</h2>
-        <p>Schau einfach in den Spiegel:</p>
-        <input type="password" id="secretCodeInput" placeholder="Tipp: alles zsm...">
+        <h2>Das Passwort ist kein Geheimnis, sondern ein Fakt 🤫</h2>
+        <p>Gehe zum Spiegel und schau dich an:</p>
+        <input type="password" id="secretCodeInput" placeholder="Tipp: alles klein und zsm...">
         <button onclick="checkSecretCode()">login <3</button>
     </div>
 
@@ -222,9 +220,12 @@
 
         <div class="main-content">
             <h3>Dein Wunsch ist mir Befehl! ✨</h3>
-            <textarea id="cakeWish" rows="4" placeholder="Alles was du willst Babygirl"></textarea>
-            <br>
-            <button onclick="lockInEnvelope()">Versand per Brieftaube. Porto 2 Küsse! ❤️</button>
+            
+            <form id="cakeForm" onsubmit="lockInEnvelope(event)">
+                <textarea name="Kuchenwunsch" id="cakeWish" rows="4" placeholder="Alles was du willst Babygirl"></textarea>
+                <br>
+                <button type="submit">Versand per Brieftaube. Porto 2 Küsse! ❤️</button>
+            </form>
 
             <div class="envelope-container" id="envelopeSection" style="display: none;">
                 <div class="envelope" id="envelopeEmoji" onclick="promptPassword()">✉️</div>
@@ -250,11 +251,9 @@
     </div>
 
 <script>
-    // Deine eingebaute Google Form-Adresse
-    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeeMNnFQkMlLPEvlGuN-IvGjxxpK5DhwjHrAUUfU0MXgZV1XQ/formResponse"; 
-    const ENTRY_ID = "entry.1463395288"; 
+    // Dein fertig eingebauter Link!
+    const FORMSPREE_URL = "https://formspree.io/f/mwvjlywj"; 
     
-    // Passwörter
     const GEHEIM_CODE = "francaistschön"; 
     const MEIN_PASSWORT = "francaistdieschönste"; 
 
@@ -265,37 +264,38 @@
             document.getElementById('mainAppContent').style.display = 'flex';
             document.body.style.justifyContent = 'flex-start';
         } else {
-            alert("Falscher Geheimcode! Du kommst hier nicht rein! 🔐");
+            alert("Falsches Passwort! Du kommst hier nicht rein! 🔐");
         }
     }
 
-    function lockInEnvelope() {
+    function lockInEnvelope(event) {
+        event.preventDefault(); 
+        
         const wishText = document.getElementById('cakeWish').value.trim();
         if(wishText === "") {
             alert("Trage erst einen Wunsch ein, Franca! 💕");
             return;
         }
 
-        // 🚀 DER NEUE RETTUNGS-VERSAND (Klassische URL-Übertragung)
-        // Wir bauen den Link so um, wie Google ihn beim echten Absenden verarbeitet
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        document.body.appendChild(iframe);
+        // Zuverlässiger Versand über Formspree
+        fetch(FORMSPREE_URL, {
+            method: "POST",
+            headers: { "Accept": "application/json", "Content-Type": "application/json" },
+            body: JSON.stringify({ "Kuchenwunsch": wishText })
+        }).then(() => {
+            console.log("Erfolgreich übertragen!");
+        }).catch((error) => {
+            console.error("Fehler:", error);
+        });
 
-        // Wir erstellen die exakte Internetadresse mit Francas Text am Ende
-        const zielLink = GOOGLE_FORM_URL + "?" + ENTRY_ID + "=" + encodeURIComponent(wishText);
-        
-        // Das unsichtbare Fenster ruft den Link auf und schießt die Daten zu Google
-        iframe.src = zielLink;
-
-        // Backup im lokalen Handyspeicher verschlüsseln
+        // Backup verschlüsseln
         const encryptedWish = btoa(unescape(encodeURIComponent(wishText)));
         localStorage.setItem('francasKuchenWunsch', encryptedWish);
 
-        // UI Updates (Umschlag schließen)
+        // UI Updates
         document.getElementById('cakeWish').value = "";
         document.getElementById('envelopeSection').style.display = 'flex';
-        document.getElementById('envelopeEmoji').innerText = "🔒";
+        document.getElementById('envelopeEmoji').innerText = "🕊️";
         document.getElementById('envelopeStatus').innerText = "Die Brieftaube ist auf dem Weg!";
         document.getElementById('secretMessage').style.display = 'none';
         
@@ -331,7 +331,7 @@
     window.onload = function() {
         if(localStorage.getItem('francasKuchenWunsch')) {
             document.getElementById('envelopeSection').style.display = 'flex';
-            document.getElementById('envelopeEmoji').innerText = "🔒";
+            document.getElementById('envelopeEmoji').innerText = "🕊️";
             document.getElementById('envelopeStatus').innerText = "Die Brieftaube ist auf dem Weg!";
         }
     }
