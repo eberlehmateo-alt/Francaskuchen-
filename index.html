@@ -250,22 +250,19 @@
     </div>
 
 <script>
+    // Deine eingebaute Google Form-Adresse
     const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeeMNnFQkMlLPEvlGuN-IvGjxxpK5DhwjHrAUUfU0MXgZV1XQ/formResponse"; 
     const ENTRY_ID = "entry.1463395288"; 
     
     // Passwörter
-    const GEHEIM_CODE = "francaistschön"; // Der neue Einlass-Code für die ganze Seite
-    const MEIN_PASSWORT = "francaistdieschönste"; // Das Passwort für den Umschlag selbst
+    const GEHEIM_CODE = "francaistschön"; 
+    const MEIN_PASSWORT = "francaistdieschönste"; 
 
-    // Funktion für den Türsteher am Anfang
     function checkSecretCode() {
         const input = document.getElementById('secretCodeInput').value.trim();
-        
         if (input === GEHEIM_CODE) {
-            // Box verstecken und eigentliche App als "flex" anzeigen
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('mainAppContent').style.display = 'flex';
-            // Layout-Anpassung, damit es nach dem Login oben anfängt
             document.body.style.justifyContent = 'flex-start';
         } else {
             alert("Falscher Geheimcode! Du kommst hier nicht rein! 🔐");
@@ -279,27 +276,30 @@
             return;
         }
 
-        const formData = new FormData();
-        formData.append(ENTRY_ID, wishText);
+        // 🚀 DER NEUE RETTUNGS-VERSAND (Klassische URL-Übertragung)
+        // Wir bauen den Link so um, wie Google ihn beim echten Absenden verarbeitet
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
 
+        // Wir erstellen die exakte Internetadresse mit Francas Text am Ende
+        const zielLink = GOOGLE_FORM_URL + "?" + ENTRY_ID + "=" + encodeURIComponent(wishText);
+        
+        // Das unsichtbare Fenster ruft den Link auf und schießt die Daten zu Google
+        iframe.src = zielLink;
+
+        // Backup im lokalen Handyspeicher verschlüsseln
         const encryptedWish = btoa(unescape(encodeURIComponent(wishText)));
         localStorage.setItem('francasKuchenWunsch', encryptedWish);
 
-        fetch(GOOGLE_FORM_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: formData
-        }).then(() => {
-            document.getElementById('cakeWish').value = "";
-            document.getElementById('envelopeSection').style.display = 'flex';
-            document.getElementById('envelopeEmoji').innerText = "🔒";
-            document.getElementById('envelopeStatus').innerText = "Die Brieftaube ist auf dem Weg!";
-            document.getElementById('secretMessage').style.display = 'none';
-            alert("Brieftaube erfolgreich angekommen! <3");
-        }).catch((error) => {
-            console.error("Fehler beim Senden:", error);
-            alert("Fehler beim Absenden passiert. Versuchs noch mal! ✨");
-        });
+        // UI Updates (Umschlag schließen)
+        document.getElementById('cakeWish').value = "";
+        document.getElementById('envelopeSection').style.display = 'flex';
+        document.getElementById('envelopeEmoji').innerText = "🔒";
+        document.getElementById('envelopeStatus').innerText = "Die Brieftaube ist auf dem Weg!";
+        document.getElementById('secretMessage').style.display = 'none';
+        
+        alert("Brieftaube erfolgreich angekommen! <3");
     }
 
     function promptPassword() {
@@ -330,7 +330,6 @@
 
     window.onload = function() {
         if(localStorage.getItem('francasKuchenWunsch')) {
-            // Falls schon ein Wunsch abgegeben wurde, Status vorbereiten (wird aber erst nach Login sichtbar)
             document.getElementById('envelopeSection').style.display = 'flex';
             document.getElementById('envelopeEmoji').innerText = "🔒";
             document.getElementById('envelopeStatus').innerText = "Die Brieftaube ist auf dem Weg!";
