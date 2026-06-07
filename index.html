@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dein Geburtstagskuchen 🎂</title>
+    <style>
+        :root {
+            --bg-pink: #FFF0F5;
+            --pastel-green: #E8F5E9;
+            --accent-pink: #FFB6C1;
+            --dark-pink: #D81B60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-pink);
+            margin: 0;
+            padding: 20px;
+            color: #4a4a4a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Zentriert die Login-Box am Anfang */
+        }
+
+        /* 🔒 STYLING FÜR DEN SPERRBILDSCHIRM (TÜRSTEHER) */
+        #loginOverlay {
+            background: white;
+            border: 4px solid var(--accent-pink);
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            text-align: center;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        #loginOverlay h2 {
+            color: var(--dark-pink);
+            margin-top: 0;
+        }
+
+        #loginOverlay input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--accent-pink);
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            margin-top: 15px;
+        }
+
+        /* 🤫 DIE EIGENTLICHE APP (Am Anfang unsichtbar) */
+        #mainAppContent {
+            display: none; /* Wird erst per JavaScript eingeschaltet */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .header-container {
+            background-color: var(--pastel-green);
+            border: 4px solid var(--accent-pink);
+            border-radius: 20px;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            box-sizing: border-box;
+        }
+
+        .header-container h1 {
+            font-size: 2.5rem;
+            color: var(--dark-pink);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .franca-img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+            z-index: 2;
+            box-sizing: border-box;
+            border: 3px solid var(--pastel-green);
+        }
+
+        h3 {
+            margin-top: 0;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 3px solid var(--pastel-green);
+            border-radius: 12px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            resize: none;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-pink);
+        }
+
+        button {
+            background-color: var(--dark-pink);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
+        }
+
+        button:hover {
+            background-color: #b01149;
+            transform: scale(1.03);
+        }
+
+        .envelope-container {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px dashed var(--accent-pink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .envelope {
+            font-size: 70px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            user-select: none;
+        }
+
+        .envelope:hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .password-box {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .password-box input {
+            padding: 10px;
+            border: 2px solid var(--accent-pink);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .bg-decor {
+            position: fixed;
+            border-radius: 15px;
+            object-fit: cover;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            z-index: 1;
+            pointer-events: none;
+            border: 5px solid white;
+        }
+
+        .img-dino { width: 180px; height: 140px; top: 10%; left: 5%; transform: rotate(-10deg); }
+        .img-pferd-1 { width: 160px; height: 140px; bottom: 15%; left: 4%; transform: rotate(8deg); }
+        .img-schmetterling-1 { width: 140px; height: 140px; top: 15%; right: 5%; transform: rotate(15deg); }
+        .img-pferd-2 { width: 150px; height: 130px; bottom: 10%; right: 6%; transform: rotate(-12deg); }
+        .img-dino-2 { width: 150px; height: 130px; bottom: 40%; left: 85%; transform: rotate(5deg); }
+        .img-schmetterling-2 { width: 110px; height: 110px; top: 45%; left: 2%; transform: rotate(-15deg); }
+
+        @media (max-width: 1000px) {
+            .bg-decor { position: static; display: inline-block; margin: 10px; }
+            .image-gallery { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loginOverlay">
+        <h2>Wir alle Wissen welches Passwort du brauchst</h2>
+        <p>Schau einfach in den Spiegel:</p>
+        <input type="password" id="secretCodeInput" placeholder="Tipp: alles zsm...">
+        <button onclick="checkSecretCode()">login <3</button>
+    </div>
+
+    <div id="mainAppContent">
+        
+        <div class="header-container">
+            <h1>Dein<br>Geburtstagskuchen</h1>
+            <img src="f.png" alt="Franca" class="franca-img">
+        </div>
+
+        <div class="main-content">
+            <h3>Dein Wunsch ist mir Befehl! ✨</h3>
+            <textarea id="cakeWish" rows="4" placeholder="Alles was du willst Babygirl"></textarea>
+            <br>
+            <button onclick="lockInEnvelope()">Versand per Brieftaube. Porto 2 Küsse! ❤️</button>
+
+            <div class="envelope-container" id="envelopeSection" style="display: none;">
+                <div class="envelope" id="envelopeEmoji" onclick="promptPassword()">✉️</div>
+                <p id="envelopeStatus" style="font-weight: bold; color: #777;">Der Brief ist versiegelt.</p>
+                
+                <div class="password-box" id="passBox">
+                    <input type="password" id="passInput" placeholder="Passwort eingeben...">
+                    <button onclick="openEnvelope()" style="padding: 8px 20px; font-size: 14px; margin-top: 5px;">Öffnen</button>
+                </div>
+                <p id="secretMessage" style="display: none; margin-top: 15px; font-weight: bold; color: var(--dark-pink); background: var(--pastel-green); padding: 15px; border-radius: 8px;"></p>
+            </div>
+        </div>
+
+        <div class="image-gallery">
+            <img src="d.jpg" alt="Dino" class="bg-decor img-dino">
+            <img src="p.jpg" alt="Pferd" class="bg-decor img-pferd-1">
+            <img src="s.png" alt="Schmetterling" class="bg-decor img-schmetterling-1">
+            <img src="p.jpg" alt="Pferd" class="bg-decor img-pferd-2">
+            <img src="d.jpg" alt="Dino" class="bg-decor img-dino-2">
+            <img src="s.png" alt="Schmetterling" class="bg-decor img-schmetterling-2">
+        </div>
+
+    </div>
+
+<script>
+    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeeMNnFQkMlLPEvlGuN-IvGjxxpK5DhwjHrAUUfU0MXgZV1XQ/formResponse"; 
+    const ENTRY_ID = "entry.1463395288"; 
+    
+    // Passwörter
+    const GEHEIM_CODE = "francaistschön"; // Der neue Einlass-Code für die ganze Seite
+    const MEIN_PASSWORT = "francaistdieschönste"; // Das Passwort für den Umschlag selbst
+
+    // Funktion für den Türsteher am Anfang
+    function checkSecretCode() {
+        const input = document.getElementById('secretCodeInput').value.trim();
+        
+        if (input === GEHEIM_CODE) {
+            // Box verstecken und eigentliche App als "flex" anzeigen
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainAppContent').style.display = 'flex';
+            // Layout-Anpassung, damit es nach dem Login oben anfängt
+            document.body.style.justifyContent = 'flex-start';
+        } else {
+            alert("Falscher Geheimcode! Du kommst hier nicht rein! 🔐");
+        }
+    }
+
+    function lockInEnvelope() {
+        const wishText = document.getElementById('cakeWish').value.trim();
+        if(wishText === "") {
+            alert("Trage erst einen Wunsch ein, Franca! 💕");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append(ENTRY_ID, wishText);
+
+        const encryptedWish = btoa(unescape(encodeURIComponent(wishText)));
+        localStorage.setItem('francasKuchenWunsch', encryptedWish);
+
+        fetch(GOOGLE_FORM_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: formData
+        }).then(() => {
+            document.getElementById('cakeWish').value = "";
+            document.getElementById('envelopeSection').style.display = 'flex';
+            document.getElementById('envelopeEmoji').innerText = "🔒";
+            document.getElementById('envelopeStatus').innerText = "Die Brieftaube ist auf dem Weg!";
+            document.getElementById('secretMessage').style.display = 'none';
+            alert("Brieftaube erfolgreich angekommen! <3");
+        }).catch((error) => {
+            console.error("Fehler beim Senden:", error);
+            alert("Fehler beim Absenden passiert. Versuchs noch mal! ✨");
+        });
+    }
+
+    function promptPassword() {
+        const passBox = document.getElementById('passBox');
+        passBox.style.display = passBox.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function openEnvelope() {
+        const enteredPass = document.getElementById('passInput').value;
+        const encryptedData = localStorage.getItem('francasKuchenWunsch');
+        if (!encryptedData) {
+            alert("Der Umschlag ist im Moment leer.");
+            return;
+        }
+        if (enteredPass === MEIN_PASSWORT) {
+            const decryptedText = decodeURIComponent(escape(atob(encryptedData)));
+            document.getElementById('envelopeEmoji').innerText = "📂";
+            document.getElementById('envelopeStatus').innerText = "Geöffnet! Hier ist Francas Wunsch:";
+            const msgDisplay = document.getElementById('secretMessage');
+            msgDisplay.innerText = decryptedText;
+            msgDisplay.style.display = 'block';
+            document.getElementById('passBox').style.display = 'none';
+            document.getElementById('passInput').value = "";
+        } else {
+            alert("Falsches Passwort! Du darfst Francas Wunsch noch nicht sehen! 🤫");
+        }
+    }
+
+    window.onload = function() {
+        if(localStorage.getItem('francasKuchenWunsch')) {
+            // Falls schon ein Wunsch abgegeben wurde, Status vorbereiten (wird aber erst nach Login sichtbar)
+            document.getElementById('envelopeSection').style.display = 'flex';
+            document.getElementById('envelopeEmoji').innerText = "🔒";
+            document.getElementById('envelopeStatus').innerText = "Die Brieftaube ist auf dem Weg!";
+        }
+    }
+</script>
+
+</body>
+</html>
